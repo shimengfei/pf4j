@@ -16,12 +16,15 @@
 package org.pf4j.demo;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.pf4j.DefaultExtensionFinder;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
+import org.pf4j.demo.api.DialogDemo;
 import org.pf4j.demo.api.Greeting;
+import sun.rmi.runtime.Log;
 
 import java.util.List;
 import java.util.Set;
@@ -33,7 +36,9 @@ import java.util.Set;
  */
 public class Boot {
 
+
     public static void main(String[] args) {
+        Logger logger=Logger.getLogger(Boot.class);
         // print logo
         printLogo();
 
@@ -54,16 +59,21 @@ public class Boot {
 
         // enable a disabled plugin
 //        pluginManager.enablePlugin("welcome-plugin");
-
         // start (active/resolved) the plugins
         pluginManager.startPlugins();
-
+        List<DialogDemo> dialogDemos=pluginManager.getExtensions(DialogDemo.class);
+        logger.info("加载扩展点---------");
+        for (DialogDemo dialog:dialogDemos) {
+            logger.info("----"+dialog.getName());
+            dialog.showDialog();
+        }
         // retrieves the extensions for Greeting extension point
         List<Greeting> greetings = pluginManager.getExtensions(Greeting.class);
         System.out.println(String.format("Found %d extensions for extension point '%s'", greetings.size(), Greeting.class.getName()));
         for (Greeting greeting : greetings) {
             System.out.println(">>> " + greeting.getGreeting());
         }
+
 
         // print extensions from classpath (non plugin)
         System.out.println("Extensions added by classpath:");
